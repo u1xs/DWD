@@ -38,7 +38,7 @@
         .text-boxes {
             display: flex;
             justify-content: center;
-            gap: 2rem;
+            gap: 3rem;
             position: relative;
         }
 
@@ -55,6 +55,7 @@
             text-align: center;
             transition: transform 0.2s ease-in-out;
             position: relative;
+            z-index: 2;
         }
 
         .text-box:hover {
@@ -65,8 +66,7 @@
         .hidden-text {
             position: absolute;
             left: 50%;
-            transform: translateX(-50%);
-            top: 100%;
+            transform: translateX(-50%) translateY(-10px);
             width: max-content;
             font-size: 1.5rem;
             font-weight: bold;
@@ -78,12 +78,13 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1;
         }
 
         .text-box.active + .hidden-text {
             opacity: 1;
             visibility: visible;
-            transform: translate(-50%, 10px);
+            transform: translate(-50%, 40px);
         }
 
         .rainbow-text {
