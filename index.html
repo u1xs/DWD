@@ -32,21 +32,13 @@
             border-radius: 10px;
             box-shadow: 0 0 30px red;
             animation: fadeIn 1.5s ease-out, shadowCycle 6s linear infinite;
+            margin-bottom: 3rem;
         }
-
-        .dwd-letter {
-            animation: sway 3s ease-in-out infinite;
-        }
-
-        .dwd-letter:nth-child(1) { animation-delay: 0s; }
-        .dwd-letter:nth-child(2) { animation-delay: 0.2s; }
-        .dwd-letter:nth-child(3) { animation-delay: 0.4s; }
 
         .text-boxes {
             display: flex;
             justify-content: space-between;
-            margin-top: 2rem;
-            gap: 1rem;
+            gap: 2rem;
         }
 
         .text-box {
@@ -58,20 +50,52 @@
             border-radius: 10px;
             background: rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 10px gold;
-            text-decoration: none;
             cursor: pointer;
             text-align: center;
+            transition: transform 0.2s ease-in-out;
         }
 
         .text-box:hover {
             background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.1);
         }
 
         .hidden-text {
             display: none;
             font-size: 1.5rem;
-            color: white;
-            margin-top: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin-top: 20px;
+            animation: slideOut 0.3s ease-in-out;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .rainbow-text {
+            background-image: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowAnim 3s linear infinite;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rainbowAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         @keyframes fadeIn {
@@ -122,22 +146,29 @@
         <div class="text-boxes">
             <div>
                 <div class="text-box" onclick="toggleText('ctx-text')">CTX</div>
-                <div id="ctx-text" class="hidden-text">kpx0. on Discord</div>
+                <div id="ctx-text" class="hidden-text rainbow-text">kpx0. on Discord</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText('zpd-text')">ZPD</div>
-                <div id="zpd-text" class="hidden-text">u1xs. on Discord</div>
+                <div id="zpd-text" class="hidden-text rainbow-text">u1xs. on Discord</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText('atc-text')">ATC</div>
-                <div id="atc-text" class="hidden-text">u9x. on Discord</div>
+                <div id="atc-text" class="hidden-text rainbow-text">u9x. on Discord</div>
             </div>
         </div>
     </div>
 
     <script>
         function toggleText(id) {
-            var element = document.getElementById(id);
+            let texts = document.querySelectorAll('.hidden-text');
+            texts.forEach(text => {
+                if (text.id !== id) {
+                    text.style.display = "none"; // Hide other text boxes
+                }
+            });
+
+            let element = document.getElementById(id);
             element.style.display = (element.style.display === "none" || element.style.display === "") ? "block" : "none";
         }
     </script>
