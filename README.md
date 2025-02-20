@@ -1,1 +1,1 @@
-https://u1xs.github.io/DWD
+https://u1xs.github.io/dwd
