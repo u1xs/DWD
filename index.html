@@ -27,12 +27,11 @@
             font-size: 8rem;
             font-weight: bold;
             color: red;
-            animation: rgbCycle 3s linear infinite, sway 3s ease-in-out infinite;
             text-shadow: 2px 2px 4px currentColor;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 30px red;
-            animation: fadeIn 1.5s ease-out, shadowCycle 6s linear infinite;
+            animation: fadeIn 1.5s ease-out, shadowCycle 6s linear infinite, sway 3s ease-in-out infinite;
             margin-bottom: 3rem;
             width: fit-content;
             margin-left: auto;
@@ -116,13 +115,6 @@
             50% { transform: translateY(-20px); }
         }
 
-        @keyframes rgbCycle {
-            0% { color: red; }
-            33% { color: green; }
-            66% { color: blue; }
-            100% { color: red; }
-        }
-
         @keyframes shadowCycle {
             0% { box-shadow: 0 0 30px red; }
             14.28% { box-shadow: 0 0 30px orange; }
@@ -153,16 +145,16 @@
         </div>
         <div class="text-boxes">
             <div>
-                <div class="text-box" onclick="toggleText(this)">ATC</div>
-                <div class="hidden-text rainbow-text">u9x. on Discord</div>
+                <div class="text-box" onclick="toggleText(this)">CTX</div>
+                <div class="hidden-text rainbow-text">kpx0. on Discord</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText(this)">ZPD</div>
                 <div class="hidden-text rainbow-text">u1xs. on Discord</div>
             </div>
             <div>
-                <div class="text-box" onclick="toggleText(this)">CTX</div>
-                <div class="hidden-text rainbow-text">kpx0. on Discord</div>
+                <div class="text-box" onclick="toggleText(this)">ATC</div>
+                <div class="hidden-text rainbow-text">u9x. on Discord</div>
             </div>
         </div>
     </div>
