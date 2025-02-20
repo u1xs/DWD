@@ -22,6 +22,7 @@
 
         .dwd-text {
             display: flex;
+            justify-content: center;
             gap: 1rem;
             font-size: 8rem;
             font-weight: bold;
@@ -33,6 +34,9 @@
             box-shadow: 0 0 30px red;
             animation: fadeIn 1.5s ease-out, shadowCycle 6s linear infinite;
             margin-bottom: 3rem;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .text-boxes {
@@ -45,21 +49,22 @@
         .text-box {
             font-size: 2rem;
             font-weight: bold;
-            color: gold;
+            color: white;
             padding: 10px 20px;
-            border: 2px solid gold;
+            border: 2px solid red;
             border-radius: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            box-shadow: 0 0 10px gold;
+            background: red;
+            box-shadow: 0 0 10px red;
             cursor: pointer;
             text-align: center;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             position: relative;
             z-index: 2;
         }
 
         .text-box:hover {
-            background: rgba(255, 215, 0, 0.2);
+            background: darkred;
+            box-shadow: 0 0 20px red;
             transform: scale(1.1);
         }
 
