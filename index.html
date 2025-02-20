@@ -13,6 +13,7 @@
             align-items: center;
             background: #141414;
             font-family: Arial, sans-serif;
+            flex-direction: column;
         }
 
         .dwd-container {
@@ -45,6 +46,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 2rem;
+            gap: 1rem;
         }
 
         .text-box {
@@ -56,12 +58,20 @@
             border-radius: 10px;
             background: rgba(0, 0, 0, 0.5);
             box-shadow: 0 0 10px gold;
-            text-decoration: none; /* Remove underline from links */
+            text-decoration: none;
             cursor: pointer;
+            text-align: center;
         }
 
         .text-box:hover {
-            background: rgba(255, 215, 0, 0.2); /* Add hover effect */
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .hidden-text {
+            display: none;
+            font-size: 1.5rem;
+            color: white;
+            margin-top: 10px;
         }
 
         @keyframes fadeIn {
@@ -110,10 +120,26 @@
             <span class="dwd-letter">D</span>
         </div>
         <div class="text-boxes">
-            <a href="/ctx" class="text-box" style="margin-right: auto;">CTX</a>
-            <a href="/zpd" class="text-box">ZPD</a>
-            <a href="/atc" class="text-box" style="margin-left: auto;">ATC</a>
+            <div>
+                <div class="text-box" onclick="toggleText('ctx-text')">CTX</div>
+                <div id="ctx-text" class="hidden-text">kpx0. on Discord</div>
+            </div>
+            <div>
+                <div class="text-box" onclick="toggleText('zpd-text')">ZPD</div>
+                <div id="zpd-text" class="hidden-text">u1xs. on Discord</div>
+            </div>
+            <div>
+                <div class="text-box" onclick="toggleText('atc-text')">ATC</div>
+                <div id="atc-text" class="hidden-text">u9x. on Discord</div>
+            </div>
         </div>
     </div>
+
+    <script>
+        function toggleText(id) {
+            var element = document.getElementById(id);
+            element.style.display = (element.style.display === "none" || element.style.display === "") ? "block" : "none";
+        }
+    </script>
 </body>
 </html>
