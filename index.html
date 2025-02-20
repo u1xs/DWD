@@ -37,8 +37,9 @@
 
         .text-boxes {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             gap: 2rem;
+            position: relative;
         }
 
         .text-box {
@@ -53,6 +54,7 @@
             cursor: pointer;
             text-align: center;
             transition: transform 0.2s ease-in-out;
+            position: relative;
         }
 
         .text-box:hover {
@@ -61,16 +63,27 @@
         }
 
         .hidden-text {
-            display: none;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 100%;
+            width: max-content;
             font-size: 1.5rem;
             font-weight: bold;
             text-transform: uppercase;
             text-align: center;
-            margin-top: 20px;
-            animation: slideOut 0.3s ease-in-out;
             background: rgba(0, 0, 0, 0.7);
             padding: 10px;
             border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .text-box.active + .hidden-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 10px);
         }
 
         .rainbow-text {
@@ -79,17 +92,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: rainbowAnim 3s linear infinite;
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         @keyframes rainbowAnim {
@@ -145,31 +147,31 @@
         </div>
         <div class="text-boxes">
             <div>
-                <div class="text-box" onclick="toggleText('ctx-text')">CTX</div>
-                <div id="ctx-text" class="hidden-text rainbow-text">kpx0. on Discord</div>
+                <div class="text-box" onclick="toggleText(this)">CTX</div>
+                <div class="hidden-text rainbow-text">kpx0. on Discord</div>
             </div>
             <div>
-                <div class="text-box" onclick="toggleText('zpd-text')">ZPD</div>
-                <div id="zpd-text" class="hidden-text rainbow-text">u1xs. on Discord</div>
+                <div class="text-box" onclick="toggleText(this)">ZPD</div>
+                <div class="hidden-text rainbow-text">u1xs. on Discord</div>
             </div>
             <div>
-                <div class="text-box" onclick="toggleText('atc-text')">ATC</div>
-                <div id="atc-text" class="hidden-text rainbow-text">u9x. on Discord</div>
+                <div class="text-box" onclick="toggleText(this)">ATC</div>
+                <div class="hidden-text rainbow-text">u9x. on Discord</div>
             </div>
         </div>
     </div>
 
     <script>
-        function toggleText(id) {
-            let texts = document.querySelectorAll('.hidden-text');
-            texts.forEach(text => {
-                if (text.id !== id) {
-                    text.style.display = "none"; // Hide other text boxes
+        function toggleText(button) {
+            // Close any open text
+            document.querySelectorAll('.text-box').forEach(btn => {
+                if (btn !== button) {
+                    btn.classList.remove('active');
                 }
             });
 
-            let element = document.getElementById(id);
-            element.style.display = (element.style.display === "none" || element.style.display === "") ? "block" : "none";
+            // Toggle selected button's text
+            button.classList.toggle('active');
         }
     </script>
 </body>
