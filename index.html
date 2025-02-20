@@ -27,12 +27,13 @@
             font-size: 8rem;
             font-weight: bold;
             color: red;
+            animation: rgbCycle 3s linear infinite;
             text-shadow: 2px 2px 4px currentColor;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 30px red;
             animation: fadeIn 1.5s ease-out, shadowCycle 6s linear infinite;
-            margin-bottom: 1.5rem;
+            margin-bottom: 3rem;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
@@ -49,36 +50,26 @@
 
         .music-controls {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 1rem;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px red;
-            margin-bottom: 1.5rem;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            background: transparent;
         }
 
-        .music-btn {
-            background: red;
-            border: none;
-            color: white;
+        .music-button {
             font-size: 1.5rem;
             font-weight: bold;
-            padding: 10px;
-            border-radius: 50%;
+            color: white;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: none;
+            border: none;
+            text-shadow: 0 0 10px red;
+            transition: text-shadow 0.2s ease-in-out;
         }
 
-        .music-btn:hover {
-            background: darkred;
-            box-shadow: 0 0 15px red;
-            transform: scale(1.1);
-        }
-
-        .volume-slider {
-            width: 100px;
+        .music-button:hover {
+            text-shadow: 0 0 20px red;
         }
 
         .text-boxes {
@@ -110,6 +101,20 @@
             transform: scale(1.1);
         }
 
+        .rainbow-text {
+            background-image: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+            background-size: 400% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowAnim 3s linear infinite;
+        }
+
+        @keyframes rainbowAnim {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -120,15 +125,6 @@
             50% { transform: translateY(-20px); }
         }
 
-        @keyframes shadowCycle {
-            0% { box-shadow: 0 0 30px red; }
-            100% { box-shadow: 0 0 30px red; }
-        }
-
-        @media (max-width: 768px) {
-            .dwd-text { font-size: 4rem; }
-            .text-box { font-size: 1.5rem; }
-        }
     </style>
 </head>
 <body>
@@ -138,78 +134,44 @@
             <span class="dwd-letter">W</span>
             <span class="dwd-letter">D</span>
         </div>
-
-        <!-- Music Controls -->
         <div class="music-controls">
-            <button class="music-btn" onclick="prevTrack()">⏮</button>
-            <button class="music-btn" onclick="togglePlayPause()">⏯</button>
-            <button class="music-btn" onclick="nextTrack()">⏭</button>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="1" oninput="setVolume(this.value)">
+            <button class="music-button" onclick="prevTrack()">⏮ Prev</button>
+            <button class="music-button" onclick="togglePlay()">▶ Play</button>
+            <button class="music-button" onclick="nextTrack()">⏭ Next</button>
         </div>
-
         <div class="text-boxes">
             <div>
-                <div class="text-box" onclick="toggleText(this)">ATC</div>
-                <div class="hidden-text">u9x. on Discord</div>
+                <div class="text-box">ATC</div>
             </div>
             <div>
-                <div class="text-box" onclick="toggleText(this)">ZPD</div>
-                <div class="hidden-text">u1xs. on Discord</div>
-            </div>
-            <div>
-                <div class="text-box" onclick="toggleText(this)">CTX</div>
-                <div class="hidden-text">kpx0. on Discord</div>
+                <div class="text-box">CTX</div>
             </div>
         </div>
     </div>
 
-    <audio id="audio-player">
-        <source src="song1.mp3" type="audio/mp3">
-        <source src="song2.mp3" type="audio/mp3">
-        <source src="song3.mp3" type="audio/mp3">
-        Your browser does not support the audio element.
-    </audio>
-
     <script>
-        let audio = document.getElementById("audio-player");
-        let isPlaying = false;
-        let trackIndex = 0;
-        let tracks = ["song1.mp3", "song2.mp3", "song3.mp3"];
+        let audio = new Audio('song1.mp3');
+        let tracks = ['song1.mp3', 'song2.mp3', 'song3.mp3'];
+        let currentTrack = 0;
 
-        function togglePlayPause() {
-            if (isPlaying) {
-                audio.pause();
-            } else {
+        function togglePlay() {
+            if (audio.paused) {
                 audio.play();
+            } else {
+                audio.pause();
             }
-            isPlaying = !isPlaying;
         }
 
         function prevTrack() {
-            trackIndex = (trackIndex - 1 + tracks.length) % tracks.length;
-            audio.src = tracks[trackIndex];
+            currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+            audio.src = tracks[currentTrack];
             audio.play();
-            isPlaying = true;
         }
 
         function nextTrack() {
-            trackIndex = (trackIndex + 1) % tracks.length;
-            audio.src = tracks[trackIndex];
+            currentTrack = (currentTrack + 1) % tracks.length;
+            audio.src = tracks[currentTrack];
             audio.play();
-            isPlaying = true;
-        }
-
-        function setVolume(value) {
-            audio.volume = value;
-        }
-
-        function toggleText(button) {
-            document.querySelectorAll('.text-box').forEach(btn => {
-                if (btn !== button) {
-                    btn.classList.remove('active');
-                }
-            });
-            button.classList.toggle('active');
         }
     </script>
 </body>
