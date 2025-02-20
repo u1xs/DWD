@@ -143,9 +143,9 @@
         </div>
 
         <div class="music-controls">
-            <button class="music-button" onclick="prevTrack()">⏮</button>
-            <button class="music-button" onclick="togglePlay()">▶️</button>
-            <button class="music-button" onclick="nextTrack()">⏭</button>
+            <button id="prev-btn" class="music-button">⏮</button>
+            <button id="play-btn" class="music-button">▶️</button>
+            <button id="next-btn" class="music-button">⏭</button>
         </div>
         <input type="range" class="volume-control" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
 
@@ -165,7 +165,7 @@
         </div>
     </div>
 
-    <audio id="music" src="yourmusic.mp3"></audio>
+    <audio id="audio-player" crossorigin="anonymous"></audio>
 
     <script>
         function toggleText(button) {
@@ -177,18 +177,40 @@
             button.classList.toggle('active');
         }
 
-        let music = document.getElementById('music');
-        function togglePlay() {
-            if (music.paused) {
-                music.play();
-            } else {
-                music.pause();
+        const audioPlayer = document.getElementById("audio-player");
+        const songs = [
+            "https://u1xs.github.io/dwd/song1.mp3",
+            "https://u1xs.github.io/dwd/song2.mp3",
+            "https://u1xs.github.io/dwd/song3.mp3"
+        ];
+        let currentSongIndex = 0;
+
+        function playMusic() {
+            if (!audioPlayer.paused) {
+                audioPlayer.pause();
             }
+            audioPlayer.src = songs[currentSongIndex];
+            audioPlayer.load();
+            audioPlayer.play().catch(error => console.error("Playback error:", error));
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            playMusic();
+        }
+
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            playMusic();
         }
 
         function setVolume(value) {
-            music.volume = value;
+            audioPlayer.volume = value;
         }
+
+        document.getElementById("play-btn").addEventListener("click", playMusic);
+        document.getElementById("next-btn").addEventListener("click", nextSong);
+        document.getElementById("prev-btn").addEventListener("click", prevSong);
     </script>
 </body>
 </html>
