@@ -91,6 +91,7 @@
             visibility: hidden;
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 1;
+            color: red;
         }
 
         .text-box.active + .hidden-text {
@@ -99,22 +100,12 @@
             transform: translate(-50%, 40px);
         }
 
-        .rainbow-text {
-            background-image: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
-            background-size: 400% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbowAnim 3s linear infinite;
-        }
-
         .music-controls {
             display: flex;
             gap: 1rem;
             justify-content: center;
             align-items: center;
             margin-bottom: 1rem;
-            color: red;
-            text-shadow: 0 0 10px red;
         }
 
         .music-button {
@@ -123,6 +114,7 @@
             color: red;
             font-size: 1.5rem;
             cursor: pointer;
+            text-shadow: 0 0 10px red;
         }
 
         .volume-control {
@@ -146,7 +138,7 @@
 
         <div class="music-controls">
             <button id="prev-btn" class="music-button">⏮ Prev</button>
-            <button id="play-btn" class="music-button">▶️ Play</button>
+            <button id="play-btn" class="music-button">Play</button>
             <button id="next-btn" class="music-button">⏭ Next</button>
         </div>
         <input type="range" class="volume-control" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
@@ -154,11 +146,15 @@
         <div class="text-boxes">
             <div>
                 <div class="text-box" onclick="toggleText(this)">ATC</div>
-                <div class="hidden-text rainbow-text">u9x. on Discord</div>
+                <div class="hidden-text">u9x. on Discord</div>
+            </div>
+            <div>
+                <div class="text-box" onclick="toggleText(this)">ZPD</div>
+                <div class="hidden-text">u1xs. on Discord</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText(this)">CTX</div>
-                <div class="hidden-text rainbow-text">u1xs. on Discord</div>
+                <div class="hidden-text">kpx0. on Discord</div>
             </div>
         </div>
     </div>
