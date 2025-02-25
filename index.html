@@ -347,17 +347,9 @@
         const canvas = document.getElementById('canvas-background');
         const ctx = canvas.getContext('2d');
         let animationId;
+        let audioContext, analyser, dataArray;
         let dwdText = document.getElementById('dwd-text');
-        let gradientOffset = 0;
-
-        // Define gradient colors for animation
-        const gradientColors = [
-            { r: 40, g: 0, b: 40 },
-            { r: 20, g: 0, b: 20 },
-            { r: 30, g: 0, b: 30 },
-            { r: 10, g: 0, b: 10 }
-        ];
-
+        
         // Make sure canvas is full size
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -392,6 +384,20 @@
         
         let currentSongIndex = 0;
 
+        // Setup audio analyzer
+        function setupAudioAnalyzer() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+            }
+        }
+
         // Function to toggle play/pause
         function togglePlayPause() {
             if (audioPlayer.paused) {
@@ -414,6 +420,7 @@
             
             audioPlayer.play().then(() => {
                 playButton.textContent = "Pause";
+                setupAudioAnalyzer();
                 if (animationId) cancelAnimationFrame(animationId);
                 animate();
                 showNotification("Now playing: " + songs[currentSongIndex].title);
@@ -423,63 +430,45 @@
             });
         }
 
-        // New function to animate dark gradient
+        // Draw black and red visualizer bars
         function animate() {
             animationId = requestAnimationFrame(animate);
             
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Create gradient
-            const gradient = ctx.createLinearGradient(
-                0, 
-                gradientOffset % canvas.height, 
-                canvas.width, 
-                (gradientOffset + canvas.height) % canvas.height
-            );
+            // Draw a black and red gradient background
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+            bgGradient.addColorStop(0.5, 'rgba(40, 0, 0, 0.9)');
+            bgGradient.addColorStop(1, 'rgba(0, 0, 0, 0.9)');
             
-            // Add gradient color stops
-            for (let i = 0; i < gradientColors.length; i++) {
-                const color = gradientColors[i];
-                const position = i / (gradientColors.length - 1);
-                gradient.addColorStop(position, `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`);
-            }
-            
-            // Apply the gradient
-            ctx.fillStyle = gradient;
+            ctx.fillStyle = bgGradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Add subtle noise effect for texture
-            addNoiseTexture();
+            if (!analyser) return;
             
-            // Move the gradient slowly
-            gradientOffset += 0.5;
+            // Get frequency data
+            analyser.getByteFrequencyData(dataArray);
             
-            // Create occasional subtle glow pulse around DWD text
-            if (Math.random() < 0.01) {
-                dwdText.style.boxShadow = '0 0 40px red';
-                setTimeout(() => {
-                    dwdText.style.boxShadow = '0 0 30px red';
-                }, 200);
+            // Draw bars
+            let barWidth = (canvas.width / dataArray.length) * 2.5;
+            let barHeight;
+            let x = 0;
+            
+            for (let i = 0; i < dataArray.length; i++) {
+                barHeight = dataArray[i] * 1.5;
+                
+                // Create gradient for each bar
+                const barGradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
+                barGradient.addColorStop(0, `rgba(255, 0, 0, ${dataArray[i]/255 * 0.8})`);
+                barGradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+                
+                ctx.fillStyle = barGradient;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                
+                x += barWidth + 1;
             }
-        }
-        
-        // Function to add subtle noise texture
-        function addNoiseTexture() {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                // Only apply to some pixels for a subtle effect
-                if (Math.random() < 0.05) {
-                    const noise = Math.random() * 10 - 5;
-                    data[i] = Math.min(255, Math.max(0, data[i] + noise)); // R
-                    data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise)); // G
-                    data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise)); // B
-                }
-            }
-            
-            ctx.putImageData(imageData, 0, 0);
         }
 
         function nextSong() {
@@ -538,6 +527,10 @@
         
         // For browsers that require user interaction
         window.addEventListener('click', function() {
+            if (!audioContext) {
+                setupAudioAnalyzer();
+            }
+            
             if (audioPlayer.paused) {
                 playMusic();
             }
