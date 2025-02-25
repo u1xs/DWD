@@ -94,6 +94,25 @@
             animation: rainbow 5s linear infinite;
         }
 
+        .secondary-text {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            width: max-content;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1;
+            background: transparent;
+            animation: rainbow 5s linear infinite;
+        }
+
         @keyframes rainbow {
             0% { color: #ff0000; }
             14% { color: #ff7f00; }
@@ -109,6 +128,12 @@
             opacity: 1;
             visibility: visible;
             transform: translate(-50%, 40px);
+        }
+
+        .text-box.active ~ .secondary-text {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 80px);
         }
 
         .music-controls {
@@ -131,6 +156,7 @@
         .volume-control {
             width: 300px;
             margin-top: 10px;
+            accent-color: black;
         }
 
         @keyframes sway {
@@ -152,20 +178,23 @@
             <button id="play-btn" class="music-button">Pause</button>
             <button id="next-btn" class="music-button">⏭ Next</button>
         </div>
-        <input type="range" class="volume-control" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
+        <input type="range" class="volume-control" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
 
         <div class="text-boxes">
             <div>
                 <div class="text-box" onclick="toggleText(this)">ATC</div>
                 <div class="hidden-text">u9x. on Discord</div>
+                <div class="secondary-text">DWD Founder</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText(this)">ZPD</div>
                 <div class="hidden-text">u1xs. on Discord</div>
+                <div class="secondary-text">Web Developer</div>
             </div>
             <div>
                 <div class="text-box" onclick="toggleText(this)">CTX</div>
                 <div class="hidden-text">kpx0. on Discord</div>
+                <div class="secondary-text">Music Producer</div>
             </div>
         </div>
     </div>
@@ -205,27 +234,11 @@
         function playMusic() {
             audioPlayer.src = songs[currentSongIndex];
             audioPlayer.load();
-            audioPlayer.volume = 0; // Start with volume at 0
+            audioPlayer.volume = 0.5; // Start with volume at 50%
             
             // Play and fade in
             audioPlayer.play().catch(error => console.error("Playback error:", error));
-            fadeIn();
-            
-            // Update button text
             playButton.textContent = "Pause";
-        }
-
-        function fadeIn() {
-            let vol = 0;
-            const interval = setInterval(function() {
-                if (vol < 1) {
-                    vol += 0.05;
-                    if (vol > 1) vol = 1;
-                    audioPlayer.volume = vol;
-                } else {
-                    clearInterval(interval);
-                }
-            }, 100);
         }
 
         function nextSong() {
@@ -243,7 +256,7 @@
         }
 
         // Start playing automatically when page loads
-        window.addEventListener('load', playMusic);
+        window.addEventListener('DOMContentLoaded', playMusic);
 
         // Add event listeners
         playButton.addEventListener("click", togglePlayPause);
