@@ -14,10 +14,31 @@
             background: #141414;
             font-family: Arial, sans-serif;
             flex-direction: column;
+            cursor: none;
+        }
+
+        .custom-cursor {
+            width: 15px;
+            height: 15px;
+            border: 2px solid red;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px red;
+            transition: transform 0.1s ease;
+            z-index: 1000;
         }
 
         .dwd-container {
             text-align: center;
+        }
+
+        .song-title {
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px red;
         }
 
         .dwd-text {
@@ -37,280 +58,118 @@
             margin-right: auto;
         }
 
-        .dwd-letter {
-            display: inline-block;
-            animation: sway 3s ease-in-out infinite;
+        .progress-bar {
+            width: 80%;
+            height: 5px;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px auto;
         }
 
-        .dwd-letter:nth-child(1) { animation-delay: 0s; }
-        .dwd-letter:nth-child(2) { animation-delay: 0.2s; }
-        .dwd-letter:nth-child(3) { animation-delay: 0.4s; }
+        .progress {
+            width: 0%;
+            height: 100%;
+            background: red;
+            transition: width 0.1s ease;
+        }
 
-        .text-boxes {
+        .visualizer {
+            width: 100%;
+            height: 200px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
             display: flex;
+            gap: 5px;
             justify-content: center;
-            gap: 3rem;
-            position: relative;
+            align-items: flex-end;
         }
 
-        .text-box {
-            font-size: 2rem;
-            font-weight: bold;
-            color: white;
-            padding: 10px 20px;
-            border: 2px solid red;
-            border-radius: 10px;
+        .bar {
+            width: 10px;
+            height: 10px;
             background: red;
             box-shadow: 0 0 10px red;
-            cursor: pointer;
-            text-align: center;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            position: relative;
-            z-index: 2;
+            animation: pulse 1s infinite ease-in-out;
         }
 
-        .text-box:hover {
-            background: darkred;
-            box-shadow: 0 0 20px red;
-            transform: scale(1.1);
-        }
-
-        .hidden-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            width: max-content;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 1;
-            background: transparent;
-            animation: rainbow 5s linear infinite;
-        }
-
-        .secondary-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            width: max-content;
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 1;
-            background: transparent;
-            animation: rainbow 5s linear infinite;
-        }
-
-        .link-text {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%) translateY(-10px);
-            width: max-content;
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-            padding: 10px;
-            border-radius: 10px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 1;
-            background: red;
-            color: white;
-            cursor: pointer;
-            border: 2px solid red;
-            box-shadow: 0 0 10px red;
-        }
-
-        .link-text:hover {
-            background: darkred;
-            box-shadow: 0 0 20px red;
-            transform: translate(-50%, 120px) scale(1.1);
-        }
-
-        @keyframes rainbow {
-            0% { color: #ff0000; }
-            14% { color: #ff7f00; }
-            28% { color: #ffff00; }
-            42% { color: #00ff00; }
-            57% { color: #0000ff; }
-            71% { color: #4b0082; }
-            85% { color: #9400d3; }
-            100% { color: #ff0000; }
-        }
-
-        .text-box.active + .hidden-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, 40px);
-        }
-
-        .text-box.active ~ .secondary-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, 80px);
-        }
-
-        .text-box.active ~ .link-text {
-            opacity: 1;
-            visibility: visible;
-            transform: translate(-50%, 120px);
-        }
-
-        .music-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .music-button {
-            background: none;
-            border: none;
-            color: red;
-            font-size: 1.5rem;
-            cursor: pointer;
-            text-shadow: 0 0 10px red;
-        }
-
-        .volume-control {
-            width: 300px;
-            margin-top: 10px;
-            accent-color: black;
-        }
-
-        @keyframes sway {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        @keyframes pulse {
+            0%, 100% { height: 10px; }
+            50% { height: 100px; }
         }
     </style>
 </head>
 <body>
+    <div class="custom-cursor" id="cursor"></div>
     <div class="dwd-container">
+        <div class="song-title" id="song-title">Now Playing: -</div>
         <div class="dwd-text">
             <span class="dwd-letter">D</span>
             <span class="dwd-letter">W</span>
             <span class="dwd-letter">D</span>
         </div>
 
-        <div class="music-controls">
-            <button id="prev-btn" class="music-button">⏮ Prev</button>
-            <button id="play-btn" class="music-button">Pause</button>
-            <button id="next-btn" class="music-button">⏭ Next</button>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
         </div>
-        <input type="range" class="volume-control" min="0" max="1" step="0.01" value="0.5" onchange="setVolume(this.value)">
 
-        <div class="text-boxes">
-            <div>
-                <div class="text-box" onclick="toggleText(this)">ATC</div>
-                <div class="hidden-text">u9x. on Discord</div>
-                <div class="secondary-text">DWD Founder</div>
-                <div class="link-text" onclick="window.open('https://guns.lol/indictment', '_blank')">GUNS</div>
-            </div>
-            <div>
-                <div class="text-box" onclick="toggleText(this)">ZPD</div>
-                <div class="hidden-text">u1xs. on Discord</div>
-                <div class="secondary-text">Web Developer</div>
-                <div class="link-text" onclick="window.open('https://guns.lol/incognito', '_blank')">GUNS</div>
-            </div>
-            <div>
-                <div class="text-box" onclick="toggleText(this)">CTX</div>
-                <div class="hidden-text">kpx0. on Discord</div>
-                <div class="secondary-text">British Person</div>
-                <div class="link-text" onclick="window.open('https://guns.lol/kpx0', '_blank')">GUNS</div>
-            </div>
-        </div>
+        <div class="visualizer" id="visualizer"></div>
+
+        <audio id="audio-player" crossorigin="anonymous"></audio>
     </div>
 
-    <audio id="audio-player" crossorigin="anonymous"></audio>
-
     <script>
-        // Make sure audio plays on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            playMusic();
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
         });
+
+        const audioPlayer = document.getElementById('audio-player');
+        const progress = document.getElementById('progress');
+        const songTitle = document.getElementById('song-title');
+        const visualizer = document.getElementById('visualizer');
+        const notificationSound = new Audio('https://u1xs.github.io/dwd/notification.mp3');
         
-        // For browsers that require user interaction
-        window.addEventListener('click', function() {
-            if (audioPlayer.paused) {
-                playMusic();
-            }
-        }, { once: true });
-
-        function toggleText(button) {
-            document.querySelectorAll('.text-box').forEach(btn => {
-                if (btn !== button) {
-                    btn.classList.remove('active');
-                }
-            });
-            button.classList.toggle('active');
-        }
-
-        const audioPlayer = document.getElementById("audio-player");
-        const playButton = document.getElementById("play-btn");
         const songs = [
-            "https://u1xs.github.io/dwd/doyouwant.mp3",
-            "https://u1xs.github.io/dwd/4thebetta.mp3",
-            "https://u1xs.github.io/dwd/lemonade.mp3"
+            { title: 'Do You Want', src: 'https://u1xs.github.io/dwd/doyouwant.mp3' },
+            { title: '4 The Betta', src: 'https://u1xs.github.io/dwd/4thebetta.mp3' },
+            { title: 'Lemonade', src: 'https://u1xs.github.io/dwd/lemonade.mp3' }
         ];
+
         let currentSongIndex = 0;
 
-        // Function to toggle play/pause
-        function togglePlayPause() {
-            if (audioPlayer.paused) {
-                audioPlayer.play().catch(error => console.error("Playback error:", error));
-                playButton.textContent = "Pause";
-            } else {
-                audioPlayer.pause();
-                playButton.textContent = "Play";
-            }
+        function playMusic() {
+            const song = songs[currentSongIndex];
+            audioPlayer.src = song.src;
+            songTitle.textContent = `Now Playing: ${song.title}`;
+            audioPlayer.load();
+            audioPlayer.volume = 0.5;
+            audioPlayer.play();
+            notificationSound.play();
         }
 
-        function playMusic() {
-            audioPlayer.src = songs[currentSongIndex];
-            audioPlayer.load();
-            audioPlayer.volume = 0.5; // Start with volume at 50%
-            
-            audioPlayer.play().then(() => {
-                playButton.textContent = "Pause";
-            }).catch(error => {
-                console.error("Autoplay prevented:", error);
-                playButton.textContent = "Play";
-            });
-        }
+        audioPlayer.addEventListener('timeupdate', () => {
+            const percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = percentage + '%';
+        });
 
         function nextSong() {
             currentSongIndex = (currentSongIndex + 1) % songs.length;
             playMusic();
         }
 
-        function prevSong() {
-            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-            playMusic();
+        // Create visualizer bars
+        for (let i = 0; i < 30; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('bar');
+            bar.style.animationDelay = `${Math.random()}s`;
+            visualizer.appendChild(bar);
         }
 
-        function setVolume(value) {
-            audioPlayer.volume = value;
-        }
-        
-        // Add event listeners
-        playButton.addEventListener("click", togglePlayPause);
-        document.getElementById("next-btn").addEventListener("click", nextSong);
-        document.getElementById("prev-btn").addEventListener("click", prevSong);
+        // Auto-play on load
+        document.addEventListener('DOMContentLoaded', playMusic);
     </script>
 </body>
 </html>
