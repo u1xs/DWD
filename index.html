@@ -84,14 +84,25 @@
             font-weight: bold;
             text-transform: uppercase;
             text-align: center;
-            background: rgba(0, 0, 0, 0.7);
             padding: 10px;
             border-radius: 5px;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 1;
-            color: red;
+            background: transparent;
+            animation: rainbow 5s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { color: #ff0000; }
+            14% { color: #ff7f00; }
+            28% { color: #ffff00; }
+            42% { color: #00ff00; }
+            57% { color: #0000ff; }
+            71% { color: #4b0082; }
+            85% { color: #9400d3; }
+            100% { color: #ff0000; }
         }
 
         .text-box.active + .hidden-text {
@@ -138,7 +149,7 @@
 
         <div class="music-controls">
             <button id="prev-btn" class="music-button">⏮ Prev</button>
-            <button id="play-btn" class="music-button">Play</button>
+            <button id="play-btn" class="music-button">Pause</button>
             <button id="next-btn" class="music-button">⏭ Next</button>
         </div>
         <input type="range" class="volume-control" min="0" max="1" step="0.01" value="1" onchange="setVolume(this.value)">
@@ -172,6 +183,7 @@
         }
 
         const audioPlayer = document.getElementById("audio-player");
+        const playButton = document.getElementById("play-btn");
         const songs = [
             "https://u1xs.github.io/dwd/doyouwant.mp3",
             "https://u1xs.github.io/dwd/4thebetta.mp3",
@@ -179,13 +191,41 @@
         ];
         let currentSongIndex = 0;
 
-        function playMusic() {
-            if (!audioPlayer.paused) {
+        // Function to toggle play/pause
+        function togglePlayPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play().catch(error => console.error("Playback error:", error));
+                playButton.textContent = "Pause";
+            } else {
                 audioPlayer.pause();
+                playButton.textContent = "Play";
             }
+        }
+
+        function playMusic() {
             audioPlayer.src = songs[currentSongIndex];
             audioPlayer.load();
+            audioPlayer.volume = 0; // Start with volume at 0
+            
+            // Play and fade in
             audioPlayer.play().catch(error => console.error("Playback error:", error));
+            fadeIn();
+            
+            // Update button text
+            playButton.textContent = "Pause";
+        }
+
+        function fadeIn() {
+            let vol = 0;
+            const interval = setInterval(function() {
+                if (vol < 1) {
+                    vol += 0.05;
+                    if (vol > 1) vol = 1;
+                    audioPlayer.volume = vol;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 100);
         }
 
         function nextSong() {
@@ -202,7 +242,11 @@
             audioPlayer.volume = value;
         }
 
-        document.getElementById("play-btn").addEventListener("click", playMusic);
+        // Start playing automatically when page loads
+        window.addEventListener('load', playMusic);
+
+        // Add event listeners
+        playButton.addEventListener("click", togglePlayPause);
         document.getElementById("next-btn").addEventListener("click", nextSong);
         document.getElementById("prev-btn").addEventListener("click", prevSong);
     </script>
