@@ -39,6 +39,29 @@
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
+            position: relative;
+        }
+
+        .pulse-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .pulse {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 0, 0, 0.3);
+            box-shadow: 0 0 60px rgba(255, 0, 0, 0.6);
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.11, 0.65, 0.33, 1), opacity 0.5s ease;
         }
 
         .dwd-letter {
@@ -270,8 +293,10 @@
 <body>
     <canvas id="canvas-background"></canvas>
 
+    <div class="pulse-container" id="pulse-container"></div>
+
     <div class="dwd-container">
-        <div class="dwd-text">
+        <div class="dwd-text" id="dwd-text">
             <span class="dwd-letter">D</span>
             <span class="dwd-letter">W</span>
             <span class="dwd-letter">D</span>
@@ -323,6 +348,11 @@
         const ctx = canvas.getContext('2d');
         let audioContext, analyser, dataArray;
         let animationId;
+        let lastBeatTime = 0;
+        let beatThreshold = 120; // Adjust this to change beat sensitivity
+        let beatDetected = false;
+        let pulseContainer = document.getElementById('pulse-container');
+        let dwdText = document.getElementById('dwd-text');
 
         // Make sure canvas is full size
         function resizeCanvas() {
@@ -357,6 +387,33 @@
         ];
         
         let currentSongIndex = 0;
+
+        // Function to create a pulse effect
+        function createPulse() {
+            const dwdRect = dwdText.getBoundingClientRect();
+            const pulseSize = Math.max(dwdRect.width, dwdRect.height) * 3;
+            
+            const pulse = document.createElement('div');
+            pulse.className = 'pulse';
+            pulse.style.width = pulseSize + 'px';
+            pulse.style.height = pulseSize + 'px';
+            pulseContainer.appendChild(pulse);
+            
+            // Trigger the animation
+            setTimeout(() => {
+                pulse.style.transform = 'scale(1)';
+                pulse.style.opacity = '0.8';
+                
+                // Remove after animation completes
+                setTimeout(() => {
+                    pulse.style.transform = 'scale(1.5)';
+                    pulse.style.opacity = '0';
+                    setTimeout(() => {
+                        pulseContainer.removeChild(pulse);
+                    }, 500);
+                }, 300);
+            }, 10);
+        }
 
         // Function to toggle play/pause
         function togglePlayPause() {
@@ -403,6 +460,30 @@
             }
         }
 
+        function detectBeat(data) {
+            // Calculate the average of low frequency energy (bass)
+            // We focus on the first 10-20 frequency bins which typically contain bass frequencies
+            let bassSum = 0;
+            const bassRange = 10; // Number of low frequency bins to check
+            
+            for (let i = 0; i < bassRange; i++) {
+                bassSum += data[i];
+            }
+            
+            const bassAvg = bassSum / bassRange;
+            
+            // Current time for debouncing
+            const now = Date.now();
+            
+            // Check if we've detected a beat and enough time has passed since the last beat
+            if (bassAvg > beatThreshold && now - lastBeatTime > 300) { // at least 300ms between beats
+                lastBeatTime = now;
+                return true;
+            }
+            
+            return false;
+        }
+
         function animate() {
             animationId = requestAnimationFrame(animate);
             
@@ -413,6 +494,17 @@
             
             // Get frequency data
             analyser.getByteFrequencyData(dataArray);
+            
+            // Check for beats
+            if (detectBeat(dataArray)) {
+                createPulse();
+                
+                // Add a subtle intensity to the DWD text shadow on beat
+                dwdText.style.textShadow = '2px 2px 15px red';
+                setTimeout(() => {
+                    dwdText.style.textShadow = '2px 2px 4px red';
+                }, 200);
+            }
             
             // Draw visualization
             let barWidth = (canvas.width / dataArray.length) * 2.5;
