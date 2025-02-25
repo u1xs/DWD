@@ -14,10 +14,14 @@
             background: #141414;
             font-family: Arial, sans-serif;
             flex-direction: column;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="red"><circle cx="12" cy="12" r="8" stroke="white" stroke-width="2"/></svg>') 12 12, auto;
+            overflow: hidden;
         }
 
         .dwd-container {
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
         .dwd-text {
@@ -73,6 +77,7 @@
             background: darkred;
             box-shadow: 0 0 20px red;
             transform: scale(1.1);
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="red"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/></svg>') 16 16, pointer;
         }
 
         .hidden-text {
@@ -139,6 +144,7 @@
             background: darkred;
             box-shadow: 0 0 20px red;
             transform: translate(-50%, 120px) scale(1.1);
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="red"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/></svg>') 16 16, pointer;
         }
 
         @keyframes rainbow {
@@ -176,6 +182,7 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 1rem;
+            position: relative;
         }
 
         .music-button {
@@ -187,24 +194,93 @@
             text-shadow: 0 0 10px red;
         }
 
+        .music-button:hover {
+            transform: scale(1.1);
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="red"><circle cx="12" cy="12" r="10" stroke="white" stroke-width="2"/></svg>') 16 16, pointer;
+        }
+
         .volume-control {
             width: 300px;
             margin-top: 10px;
-            accent-color: black;
+            accent-color: red;
+        }
+
+        .progress-container {
+            width: 100%;
+            max-width: 500px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 5px;
+            margin: 10px auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: red;
+            width: 0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px red;
+            transition: width 0.1s linear;
+        }
+
+        .song-info {
+            color: white;
+            font-size: 1.2rem;
+            margin: 10px 0;
+            text-shadow: 0 0 5px red;
+        }
+
+        #canvas-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
 
         @keyframes sway {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: red;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px red;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: 100;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
     </style>
 </head>
 <body>
+    <canvas id="canvas-background"></canvas>
+
     <div class="dwd-container">
         <div class="dwd-text">
             <span class="dwd-letter">D</span>
             <span class="dwd-letter">W</span>
             <span class="dwd-letter">D</span>
+        </div>
+
+        <div class="song-info" id="song-title">Now Playing: Loading...</div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
         </div>
 
         <div class="music-controls">
@@ -236,37 +312,50 @@
         </div>
     </div>
 
+    <div class="notification" id="notification">Notification</div>
+
     <audio id="audio-player" crossorigin="anonymous"></audio>
+    <audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-back-2575.mp3"></audio>
 
     <script>
-        // Make sure audio plays on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            playMusic();
-        });
-        
-        // For browsers that require user interaction
-        window.addEventListener('click', function() {
-            if (audioPlayer.paused) {
-                playMusic();
-            }
-        }, { once: true });
+        // Setup for audio visualization
+        const canvas = document.getElementById('canvas-background');
+        const ctx = canvas.getContext('2d');
+        let audioContext, analyser, dataArray;
+        let animationId;
 
-        function toggleText(button) {
-            document.querySelectorAll('.text-box').forEach(btn => {
-                if (btn !== button) {
-                    btn.classList.remove('active');
-                }
-            });
-            button.classList.toggle('active');
+        // Make sure canvas is full size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
+        // Audio setup
         const audioPlayer = document.getElementById("audio-player");
         const playButton = document.getElementById("play-btn");
+        const progressBar = document.getElementById("progress-bar");
+        const songTitleElement = document.getElementById("song-title");
+        const notificationSound = document.getElementById("notification-sound");
+        const notification = document.getElementById("notification");
+        
         const songs = [
-            "https://u1xs.github.io/dwd/doyouwant.mp3",
-            "https://u1xs.github.io/dwd/4thebetta.mp3",
-            "https://u1xs.github.io/dwd/lemonade.mp3"
+            {
+                url: "https://u1xs.github.io/dwd/doyouwant.mp3",
+                title: "Do You Want"
+            },
+            {
+                url: "https://u1xs.github.io/dwd/4thebetta.mp3",
+                title: "4 The Betta"
+            },
+            {
+                url: "https://u1xs.github.io/dwd/lemonade.mp3",
+                title: "Lemonade"
+            }
         ];
+        
         let currentSongIndex = 0;
 
         // Function to toggle play/pause
@@ -274,23 +363,75 @@
             if (audioPlayer.paused) {
                 audioPlayer.play().catch(error => console.error("Playback error:", error));
                 playButton.textContent = "Pause";
+                if (animationId) cancelAnimationFrame(animationId);
+                animate();
             } else {
                 audioPlayer.pause();
                 playButton.textContent = "Play";
+                cancelAnimationFrame(animationId);
             }
         }
 
         function playMusic() {
-            audioPlayer.src = songs[currentSongIndex];
+            audioPlayer.src = songs[currentSongIndex].url;
+            songTitleElement.textContent = "Now Playing: " + songs[currentSongIndex].title;
             audioPlayer.load();
             audioPlayer.volume = 0.5; // Start with volume at 50%
             
             audioPlayer.play().then(() => {
                 playButton.textContent = "Pause";
+                setupAudioAnalyzer();
+                if (animationId) cancelAnimationFrame(animationId);
+                animate();
+                showNotification("Now playing: " + songs[currentSongIndex].title);
             }).catch(error => {
                 console.error("Autoplay prevented:", error);
                 playButton.textContent = "Play";
             });
+        }
+
+        function setupAudioAnalyzer() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                const source = audioContext.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioContext.destination);
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+            }
+        }
+
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (!analyser) return;
+            
+            // Get frequency data
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Draw visualization
+            let barWidth = (canvas.width / dataArray.length) * 2.5;
+            let barHeight;
+            let x = 0;
+            
+            for (let i = 0; i < dataArray.length; i++) {
+                barHeight = dataArray[i] * 2;
+                
+                // Create gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, `rgba(255, 0, 0, ${dataArray[i]/255})`);
+                gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                
+                x += barWidth + 1;
+            }
         }
 
         function nextSong() {
@@ -306,11 +447,66 @@
         function setVolume(value) {
             audioPlayer.volume = value;
         }
+
+        function updateProgressBar() {
+            if (audioPlayer.duration > 0) {
+                const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+                progressBar.style.width = progress + '%';
+            }
+        }
+
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            notificationSound.play();
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function toggleText(button) {
+            const wasActive = button.classList.contains('active');
+            
+            document.querySelectorAll('.text-box').forEach(btn => {
+                if (btn !== button) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            if (!wasActive) {
+                button.classList.add('active');
+                notificationSound.play();
+                showNotification(button.textContent + " selected!");
+            } else {
+                button.classList.remove('active');
+            }
+        }
+        
+        // Make sure audio plays on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            playMusic();
+        });
+        
+        // For browsers that require user interaction
+        window.addEventListener('click', function() {
+            if (!audioContext) {
+                setupAudioAnalyzer();
+            }
+            
+            if (audioPlayer.paused) {
+                playMusic();
+            }
+        }, { once: true });
         
         // Add event listeners
         playButton.addEventListener("click", togglePlayPause);
         document.getElementById("next-btn").addEventListener("click", nextSong);
         document.getElementById("prev-btn").addEventListener("click", prevSong);
+        audioPlayer.addEventListener("timeupdate", updateProgressBar);
+        
+        // Song ended event
+        audioPlayer.addEventListener("ended", nextSong);
     </script>
 </body>
 </html>
