@@ -123,14 +123,22 @@
             text-transform: uppercase;
             text-align: center;
             padding: 10px;
-            border-radius: 5px;
+            border-radius: 10px;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, transform 0.3s ease;
             z-index: 1;
-            background: transparent;
-            animation: rainbow 5s linear infinite;
+            background: red;
+            color: white;
             cursor: pointer;
+            border: 2px solid red;
+            box-shadow: 0 0 10px red;
+        }
+
+        .link-text:hover {
+            background: darkred;
+            box-shadow: 0 0 20px red;
+            transform: translate(-50%, 120px) scale(1.1);
         }
 
         @keyframes rainbow {
